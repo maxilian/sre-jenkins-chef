@@ -1,10 +1,10 @@
 # INSTALL CHEF WORKSTATION AND SERVER CORE
 
-used for automation process to server
+Used to make automation process
 
 ---
 
-## SETTING UP CHEF SERVER CORE FOR MASTER NODE
+## SETTING UP CHEF SERVER CORE AND WORKSTATION FOR MASTER NODE
 
 Get the right package from official source
 
@@ -23,7 +23,7 @@ Get the right package from official source
 4. run following command to configure chef server
 ```
     sudo chef-server-ctl reconfigure
-    sudo chef-server-ctl user-create administrator admin aja administrator@localhost.local 'Adalah123.' --filename ~/administrator.pem
+    sudo chef-server-ctl user-create administrator admin aja administrator@localhost.local 'PasswordHere' --filename ~/administrator.pem
     sudo chef-server-ctl org-create panicscript 'Panicscript Test' --association_user administrator --filename ~/panicscript-validator.pem
 ```
 
@@ -37,7 +37,7 @@ Get the right package from official source
 
 ---
 
-## WORKING WITH COOKBOOKS AND REPOSITORY
+## WORKING WITH COOKBOOKS AND REPOSITORIES
 
 
 1. initialize directory .chef/cookbooks in user home as a git repository and provide identity owner for this local repo
