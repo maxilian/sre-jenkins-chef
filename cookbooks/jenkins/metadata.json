@@ -1,0 +1,43 @@
+{
+  "name": "jenkins",
+  "description": "Installs and configures Jenkins CI master & slaves",
+  "long_description": "",
+  "maintainer": "Sous Chefs",
+  "maintainer_email": "help@sous-chefs.org",
+  "license": "Apache-2.0",
+  "platforms": {
+    "amazon": ">= 0.0.0",
+    "centos": ">= 0.0.0",
+    "debian": ">= 0.0.0",
+    "oracle": ">= 0.0.0",
+    "redhat": ">= 0.0.0",
+    "scientific": ">= 0.0.0",
+    "ubuntu": ">= 0.0.0"
+  },
+  "dependencies": {
+    "dpkg_autostart": ">= 0.0.0",
+    "yum-epel": ">= 0.0.0"
+  },
+  "providing": {
+
+  },
+  "recipes": {
+
+  },
+  "version": "9.5.2",
+  "source_url": "https://github.com/sous-chefs/jenkins",
+  "issues_url": "https://github.com/sous-chefs/jenkins/issues",
+  "privacy": false,
+  "chef_versions": [
+    [
+      ">= 13.0"
+    ]
+  ],
+  "ohai_versions": [
+
+  ],
+  "gems": [
+
+  ],
+  "eager_load_libraries": true
+}
