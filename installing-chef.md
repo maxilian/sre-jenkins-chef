@@ -119,7 +119,7 @@ Before we can adding node, we should install chef workstation om each node
 
 ## SETUP JENKINS DOCKER PLUGIN USING CHEF
 
-A. Install Docker Plufin For Jenkins
+A. Install Docker Plugin For Jenkins
 
 1. Go to chef repository (~/.chef/cookbooks) and Install jenkins recipe from supermarket
 ```    
@@ -158,7 +158,7 @@ A. Install Docker Plufin For Jenkins
 ```
     knife ssh "name:master-chef" "sudo chef-client" -x administrator
 ```
-B. Enable Docker plugin from jenkins dashboard and restart service
+B. Enable Docker plugin from jenkins dashboard and restart jenkins service
 ```
     sudo systemctl restart jenkins
 ```
