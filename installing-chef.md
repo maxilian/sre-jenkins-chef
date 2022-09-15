@@ -117,7 +117,7 @@ Before we can adding node, we should install chef workstation om each node
 
 ---
 
-## SETUP DOCKER JENKINS BASED USING CHEF
+## SETUP JENKINS DOCKER PLUGIN USING CHEF
 
 A. Install Docker Plufin For Jenkins
 
@@ -146,11 +146,11 @@ A. Install Docker Plufin For Jenkins
 ```
     knife cookbook upload cookbookNameHere
 ```
-6. Add local server into chef master:
+6. Add local server into chef master node:
 ```   
     knife bootstrap node-ip-address -U administrator -P 'PassowordUsed' --use-sudo-password --sudo --node-name nodeNameHere
 ```
-7. Add install list to node (in instance that contain chef master and jenkins master):
+7. Add install list recipe to master node:
 ```
     knife node run_list add nodeNameHere "recipe[jenkins_install_docker_plugin]"
 ```
@@ -229,7 +229,7 @@ B. Create cookbook and recipe
 ```
     Or you can run knife upload . to uploading all cookbook inside repo
 
-8. Add recipe install list to slave nodes
+8. Add install list recipe to slave nodes
 ```
     knife node run_list add nodeNameHere "recipe[install_jenkins_slave::inbound_agent]"
     knife node run_list add node2NameHere "recipe[install_jenkins_slave::inbound_agent_2]"
