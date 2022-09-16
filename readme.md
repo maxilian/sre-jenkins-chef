@@ -9,3 +9,4 @@ This repo contain all required files and instructions that consist of :
     * [Setup Jenkins Docker Plugin Using Chef](./installing-chef.md#setup-jenkins-docker-plugin-using-chef)
     * [Installing Docker Based Jenkins Slave Container](./installing-chef.md#installing-docker-based-jenkins-slave-container)
 3. Cookbooks and Recipe to install docker, jenkins agent, jenkins docker plugin [link](./cookbooks/)
+4. [Jenkins Pipeline](./pipeline-instruction.md)
