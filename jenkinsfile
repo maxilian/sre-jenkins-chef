@@ -1,0 +1,55 @@
+pipeline {
+    agent {
+        label 'master-node'
+    }
+    stages {
+        stage("Update repo master branch") {
+            steps {
+                git url: 'https://github.com/maxilian/swarm-microservice-demo-v1', branch: 'master'
+                
+            }
+        }
+
+        stage("Build web-vote-app") {
+            steps {
+                sh """
+                    cd web-vote-app
+                    docker build -t 172.18.100.71:5000/voteapps/web-vote-app:latest .
+                    docker push 172.18.100.71:5000/voteapps/web-vote-app:latest
+                """
+            }
+
+        }
+
+        stage("Build result-app") {
+            steps {
+                sh """
+                    cd results-app
+                    docker build -t 172.18.100.71:5000/voteapps/results-app:latest .
+                    docker push 172.18.100.71:5000/voteapps/results-app:latest
+                """
+            }
+
+        }
+
+
+        stage("Build vote-worker") {
+            steps {
+                sh """
+                    cd vote-worker
+                    docker build -t 172.18.100.71:5000/voteapps/vote-worker:latest .
+                    docker push 172.18.100.71:5000/voteapps/vote-worker:latest
+                """
+            }
+
+        }
+
+        stage("Deploy") {
+
+            steps {
+                sh "ls -al"
+                sh "docker stack deploy --compose-file deploy-voting-apps.yml votingapps"
+            }
+        }
+    }
+}
