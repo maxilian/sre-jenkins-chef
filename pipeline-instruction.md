@@ -157,7 +157,9 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
 
 We have 3 docker servers which join docker swarm that consist of 1 node manager (test-71) and 2 worker nodes (test-72 and test-73).  
 
-1. We will deploy a combination of web-vote-app (accessible from port 4000) and 2 redis to worker node. Since we cannot expose the same ports from two or more services (that's how clustered environment works and docker too) for redis container we will not expose port to public. Jenkinsfile snippet:
+1. We will deploy a combination of web-vote-app (accessible from port 4000) and 2 redis to worker node. Since we cannot expose the same ports from two or more services for redis container we will not expose port to public (that's how clustered environment works and docker too). So, all services can be accessed from Cluster Manager ip address/hostname or by using reverse proxy. Which in the end the traffic will be handled by cluster manager through swarm overlay network.
+
+Jenkinsfile snippet:
     ```
         stage("Deploy web-vote-app and redis to worker node")
         {
@@ -168,13 +170,13 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
                         docker service create \
                         --name redis01 \
                         --network test-network \
-                        --replicas 2 \
+                        --replicas 1 \
                         --publish 6379:6379 \
                         --constraint node.hostname!=test-71 \
                         --detach redis:3
                     else 
                         docker service update \
-                        --replicas 2 \
+                        --replicas 1 \
                         --publish-add 6379:6379 \
                         --image redis:3 \
                         --constraint node.hostname!=test-71 \
