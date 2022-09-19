@@ -90,10 +90,10 @@ Get the right package from official source
 
 Before we can adding node, we should install chef workstation om each node
 
-    ```
-    wget https://packages.chef.io/files/stable/chef-workstation/21.10.640/ubuntu/20.04/chef-workstation_21.10.640-1_amd64.deb 
-    sudo dpkg -i *.deb
-    ```
+```
+wget https://packages.chef.io/files/stable/chef-workstation/21.10.640/ubuntu/20.04/chef-workstation_21.10.640-1_amd64.deb 
+sudo dpkg -i *.deb
+```
 
 1. From chef master add all node ip addresses into /etc/hosts
     ```
@@ -162,10 +162,10 @@ A. Install Docker Plugin For Jenkins
     knife ssh "name:master-chef" "sudo chef-client" -x administrator
     ```
 
-B.  Enable Docker plugin from jenkins dashboard and restart jenkins service
+B. Enable Docker plugin from jenkins dashboard and restart jenkins service
 
     ```
-        sudo systemctl restart jenkins
+    sudo systemctl restart jenkins
     ```
 
 ---
