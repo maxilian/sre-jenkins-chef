@@ -40,7 +40,7 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
 4. Fork repo from https://github.com/docker-archive/swarm-microservice-demo-v1, so we can make some changes on configuration file within our repo. [forked repo](https://github.com/maxilian/swarm-microservice-demo-v1)
 
 ## Getting ready to build docker images required by voting apps
-1. Update some files in order to avoid deprecated dependencies such as changing java7 to java 8 or above. [[reference](https://stackoverflow.com/questions/50824789/why-am-i-getting-received-fatal-alert-protocol-version-or-peer-not-authentic)]
+1. Update some files in order to avoid deprecated dependencies such as changing java 7 to java 8 or above. [[reference](https://stackoverflow.com/questions/50824789/why-am-i-getting-received-fatal-alert-protocol-version-or-peer-not-authentic)]
 
     * [vote-worker/Dockerfile](https://github.com/maxilian/swarm-microservice-demo-v1/blob/master/vote-worker/Dockerfile)
     ```
@@ -103,6 +103,14 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
         }
     }
     ```
+2. Make new pipeline for build and deploy apps.
+
+    * Click new item from Jenkins Dashboard fill the name and select pipeline before clicking OK.
+    ![New Pipeline Wizard](./images/jenkins-create-pipeline-wizard.png)
+    * Fill description, tick github checkbox and then fill with forked repo url `https://github.com/maxilian/swarm-microservice-demo-v1`
+    ![Fill repo source](./images/jenkins-newly-created-pipeline-1.png "Filling source code repo")
+    * in Build Triggers section tick `GitHub hook trigger for GITScm polling`
+     ![Select build triggers](./images/jenkins-newly-created-pipeline-2.png "Select build triggers")
 
 2. Build docker image for vote-worker
     ```
