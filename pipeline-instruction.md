@@ -37,7 +37,7 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
     ```
     docker run -d -p 5000:5000 --restart=always --name registry registry:2
     ```
-4. Fork repo from https://github.com/docker-archive/swarm-microservice-demo-v1
+4. Fork repo from https://github.com/docker-archive/swarm-microservice-demo-v1, so we can make some changes on configuration file within our repo. [forked repo](https://github.com/maxilian/swarm-microservice-demo-v1)
 
 ## Getting ready to build docker images required by voting apps
 1. Update some files in order to avoid deprecated dependencies such as changing java7 to java 8 or above. [[reference](https://stackoverflow.com/questions/50824789/why-am-i-getting-received-fatal-alert-protocol-version-or-peer-not-authentic)]
@@ -60,6 +60,9 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
 
     CMD ["/usr/lib/jvm/java-11-openjdk-amd64/bin/java", "-jar", "target/worker-jar-with-dependencies.jar"]
     ```
+
+    * 
+
 2. Build docker image for vote-worker
     ```
     cd vote-worker
@@ -154,11 +157,16 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
                 --env POSTGRES_PASSWORD=pg8675309 \
                 --network test-network  \
                 --publish 5432:5432 \
-                --detach postgres:9.6
+                --detach postgres:9.0
             else
-                docker service update \
-                --publish-add 5432:5432 \
-                --detach store
+                docker service rm store
+                docker service create \
+                --constraint node.hostname==test-71 \
+                --name store \
+                --env POSTGRES_PASSWORD=pg8675309 \
+                --network test-network  \
+                --publish 5432:5432 \
+                --detach postgres:9.0
             fi
             '''
         }
@@ -166,5 +174,9 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
     ```
 
 3. Jenkinsfile for this project will be like this [link](./jenkinsfile)
+4. To check all container is running well, we can use this docker command:
+    ```
+    docker service ls 
+    ```
+5. Some container may need to be manually removed (or even can be wrote into jenkinsfile) because cached file is still exist.
 
-6. Create new docker-compose to deploy the apps [link](deploy-voting-apps.yml)

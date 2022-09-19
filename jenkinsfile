@@ -104,10 +104,14 @@ pipeline {
                     --publish 5432:5432 \
                     --detach postgres:9.0
                 else
-                    docker service update \
-                    --publish-add 5432:5432 \
-                    --image postgres:9.0 \
-                    --detach store
+                    docker service rm store
+                    docker service create \
+                    --constraint node.hostname==test-71 \
+                    --name store \
+                    --env POSTGRES_PASSWORD=pg8675309 \
+                    --network test-network  \
+                    --publish 5432:5432 \
+                    --detach postgres:9.0
                 fi
                 '''
             }
