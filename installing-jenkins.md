@@ -21,3 +21,5 @@
     cat /var/lib/jenkins/secrets/initialAdminPassword
     ```
 5. Access jenkins from url: http://ipserver:8080 and enter initial password to start installation wizard
+
+ ![install jenkins](./images/install-jenkins.png "install jenkins")
