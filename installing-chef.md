@@ -89,6 +89,7 @@ Get the right package from official source
 ## SETUP CHEF NODES (FROM CHEF MANAGER/MASTER) AND INSTALL DOCKER TO ALL NODE
 
 Before we can adding node, we should install chef workstation om each node
+
     ```
     wget https://packages.chef.io/files/stable/chef-workstation/21.10.640/ubuntu/20.04/chef-workstation_21.10.640-1_amd64.deb 
     sudo dpkg -i *.deb
@@ -229,7 +230,7 @@ B. Create cookbook and recipe
     ```
     knife cookbook upload cookbookNameHere
     ```
-    Or you can run knife upload . to uploading all cookbook inside repo
+    Or you can run `knife upload .` to uploading all cookbook inside repo
 
 8. Add install list recipe to slave nodes
     ```
