@@ -127,14 +127,14 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
     * 172.18.100.71:5000/voteapps/results-app
     * 172.18.100.71:5000/voteapps/web-vote-app
     * redis:3 
-    * postgre:9.0
+    * postgre:9.1
 
 
 ## Preparing Jenkins Pipeline File
 
 We have 3 docker servers which join docker swarm that consist of 1 node manager (test-71) and 2 worker nodes (test-72 and test-73).  
 
-1. We will deploy a combination of web-vote-app (using port 4000) and redis (using port 6379) to worker node. Since we cannot expose the same ports from two or more services (that's how clustered environment works and docker too), so in this scenario we will deploy 2 replicas from a pair of web-vote-app and redis. Jenkinsfile snippet:
+1. We will deploy a combination of web-vote-app (accessible from port 4000) and 2 redis to worker node. Since we cannot expose the same ports from two or more services (that's how clustered environment works and docker too) for redis container we will not expose port to public. Jenkinsfile snippet:
     ```
         stage("Deploy web-vote-app and redis to worker node")
         {
@@ -158,6 +158,20 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
                         --detach redis01
                     fi
                     
+                    if [ ! "$(docker service ps redis02)" ]; then
+                        docker service create \
+                        --name redis02 \
+                        --network test-network \
+                        --replicas 1 \
+                        --constraint node.hostname!=test-71 \
+                        --detach redis:3
+                    else 
+                        docker service update \
+                        --replicas 1 \
+                        --constraint-add node.hostname!=test-71 \
+                        --image redis:3 \
+                        --detach redis02
+                    fi
 
                     if [ ! "$(docker service ps frontend01)" ]; then
                        docker service create \
@@ -185,20 +199,20 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
 
     ```
 
-2. The next step we will deploy results-app (using port 8089), postgresql (using port 5432), and vote-worker to node test-71. Jenkinsfile snippet:
+2. The next step we will deploy results-app (port 8089), postgresql, and vote-worker to node test-71. Jenkinsfile snippet:
     ```
     stage("Deploy postgresql as DB") {
 
         steps {
             sh '''
-            if [ ! "$(docker service ps postgres)" ]; then
+            if [ ! "$(docker service ps store)" ]; then
                 docker service create \
                 --constraint node.hostname==test-71 \
                 --name store \
                 --env POSTGRES_PASSWORD=pg8675309 \
                 --network test-network  \
                 --publish 5432:5432 \
-                --detach postgres:9.0
+                --detach postgres:9.1
             else
                 docker service rm store
                 docker service create \
@@ -207,7 +221,7 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
                 --env POSTGRES_PASSWORD=pg8675309 \
                 --network test-network  \
                 --publish 5432:5432 \
-                --detach postgres:9.0
+                --detach postgres:9.1
             fi
             '''
         }
@@ -222,7 +236,7 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
 5. After database is running then we will make new table to store voting result. Run this command from node manager
     ```
     docker exec "$(docker ps -q -f name=store)" psql -U postgres -c \
-    "CREATE TABLE IF NOT EXISTS votes (id integer CONSTRAINT pk_id_votes PRIMARY KEY, vote varchar(10), ts TIMESTAMP WITHOUT TIME ZONE);"
+    "CREATE TABLE votes (id integer CONSTRAINT pk_id_votes PRIMARY KEY, vote varchar(10), ts TIMESTAMP WITHOUT TIME ZONE);"
     ```
 6. Some container may need to be manually removed (or even can be wrote into jenkinsfile) because cached file is still exist.
 

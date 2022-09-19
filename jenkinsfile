@@ -54,17 +54,31 @@ pipeline {
                         docker service create \
                         --name redis01 \
                         --network test-network \
-                        --replicas 2 \
-                        --publish 6379:6379 \
+                        --replicas 1 \
+                        
                         --constraint node.hostname!=test-71 \
                         --detach redis:3
                     else 
                         docker service update \
-                        --replicas 2 \
-                        --publish-add 6379:6379 \
+                        --replicas 1 \
                         --constraint-add node.hostname!=test-71 \
                         --image redis:3 \
                         --detach redis01
+                    fi
+
+                    if [ ! "$(docker service ps redis02)" ]; then
+                        docker service create \
+                        --name redis02 \
+                        --network test-network \
+                        --replicas 1 \
+                        --constraint node.hostname!=test-71 \
+                        --detach redis:3
+                    else 
+                        docker service update \
+                        --replicas 1 \
+                        --constraint-add node.hostname!=test-71 \
+                        --image redis:3 \
+                        --detach redis02
                     fi
                     
 
@@ -78,13 +92,15 @@ pipeline {
                         --env WEB_VOTE_NUMBER='01' \
                         --detach 172.18.100.71:5000/voteapps/web-vote-app:latest
                     else 
-                       docker service update \
+                       docker service rm frontend01
+                       docker service create \
+                        --name frontend01 \
+                        --network test-network \
                         --replicas 2 \
-                        --publish-add 4000:80 \
-                        --constraint-add node.hostname!=test-71 \
-                        --env-add WEB_VOTE_NUMBER='01' \
-                        --image 172.18.100.71:5000/voteapps/web-vote-app:latest \
-                        --detach frontend01
+                        --publish 4000:80 \
+                        --constraint node.hostname!=test-71 \
+                        --env WEB_VOTE_NUMBER='01' \
+                        --detach 172.18.100.71:5000/voteapps/web-vote-app:latest
                     fi
                     
                 '''
@@ -102,7 +118,7 @@ pipeline {
                     --env POSTGRES_PASSWORD=pg8675309 \
                     --network test-network  \
                     --publish 5432:5432 \
-                    --detach postgres:9.0
+                    --detach postgres:9.1
                 else
                     docker service rm store
                     docker service create \
@@ -111,7 +127,7 @@ pipeline {
                     --env POSTGRES_PASSWORD=pg8675309 \
                     --network test-network  \
                     --publish 5432:5432 \
-                    --detach postgres:9.0
+                    --detach postgres:9.1
                 fi
                 '''
             }
@@ -132,11 +148,15 @@ pipeline {
                     --network test-network  \
                     --detach 172.18.100.71:5000/voteapps/vote-worker:latest
                 else
-                    docker service update \
-                    --env-add WORKER_NUMBER="01" \
-                    --env-add FROM_REDIS_HOST=1 \
-                    --env-add TO_REDIS_HOST=2 \
-                    --detach vote-worker
+                    docker service rm vote-worker
+                    docker service create \
+                    --constraint node.hostname==test-71 \
+                    --name vote-worker \
+                    --env WORKER_NUMBER="01" \
+                    --env FROM_REDIS_HOST=1 \
+                    --env TO_REDIS_HOST=2 \
+                    --network test-network  \
+                    --detach 172.18.100.71:5000/voteapps/vote-worker:latest
                 fi
 
                 '''
@@ -156,10 +176,13 @@ pipeline {
                     --network test-network  \
                     --detach 172.18.100.71:5000/voteapps/results-app:latest
                 else
-                    docker service update \
-                    --publish-add 8089:80 \
-                    --image 172.18.100.71:5000/voteapps/results-app \
-                    --detach results-app
+                    docker service rm results-app
+                    docker service create \
+                    --constraint node.hostname==test-71 \
+                    --name results-app \
+                    --publish 8089:80 \
+                    --network test-network  \
+                    --detach 172.18.100.71:5000/voteapps/results-app:latest
                 fi
 
                 '''
