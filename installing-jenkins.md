@@ -1,4 +1,4 @@
-# INSTALL JENKINS ON UBUNTU 20.04
+# INSTALL JENKINS ON UBUNTU SERVER 20.04
 
 1. Add jenkins repo to source list
     ```
