@@ -168,9 +168,9 @@ B. Enable Docker plugin from jenkins dashboard and restart jenkins service
     ```
 ---
 
-## INSTALLING DOCKER BASED JENKINS SLAVE CONTAINER USING CHEF RECIPES
+## INSTALLING JENKINS AGENT CONTAINER USING CHEF RECIPES
 
-In this section, we will install jenkins slave using jenkins:inbound-agent image by using chef as orchestration tools.
+In this section, we will install jenkins agent (jenkins slave) using jenkins:inbound-agent image by using chef as orchestration tools.
 
 A. Adding each slave node into jenkins
 
