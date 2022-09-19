@@ -42,7 +42,7 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
 ## Getting ready to build docker images required by voting apps
 1. Update some files in order to avoid deprecated dependencies such as changing java7 to java 8 or above. [[reference](https://stackoverflow.com/questions/50824789/why-am-i-getting-received-fatal-alert-protocol-version-or-peer-not-authentic)]
 
-    * vote-worker/Dockerfile
+    * [vote-worker/Dockerfile](https://github.com/maxilian/swarm-microservice-demo-v1/blob/master/vote-worker/Dockerfile)
     ```
     FROM openjdk:11
 
@@ -61,7 +61,48 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
     CMD ["/usr/lib/jvm/java-11-openjdk-amd64/bin/java", "-jar", "target/worker-jar-with-dependencies.jar"]
     ```
 
-    * 
+    * [results-app/Dockerfile](https://github.com/maxilian/swarm-microservice-demo-v1/blob/master/results-app/Dockerfile)
+    ```
+    FROM node:5.1.1-slim
+
+    RUN mkdir /app
+    WORKDIR /app
+
+    ADD package.json /app/package.json
+    RUN npm install && npm ls
+    RUN mv /app/node_modules /node_modules
+
+    ADD . /app
+
+    ENV PORT 80
+    EXPOSE 80
+
+    CMD ["node", "server.js"]
+
+    ```
+    * [results-app/package.json](https://github.com/maxilian/swarm-microservice-demo-v1/blob/master/results-app/package.json)
+    ```
+    {
+        "name": "result-app",
+        "version": "1.0.0",
+        "description": "",
+        "main": "server.js",
+        "scripts": {
+            "test": "echo \"Error: no test specified\" && exit 1"
+        },
+        "author": "",
+        "license": "MIT",
+        "dependencies": {
+            "body-parser": "^1.14.1",
+            "cookie-parser": "^1.4.0",
+            "express": "^4.13.3",
+            "method-override": "^2.3.5",
+            "async": "^1.5.0",
+            "pg": "^5.0",
+            "socket.io": "^1.3.7"
+        }
+    }
+    ```
 
 2. Build docker image for vote-worker
     ```
