@@ -1,6 +1,6 @@
 # ABOUT THIS REPO
 
-This repo contain all required files and instructions that consist of :
+This repo contain all required files and instructions to deploy jenkins, chef, docker, and voting apps container that consist of :
 1. [Step by step how to install jenkins](./installing-jenkins.md)
 2. Step by step how to install chef workstation and chef server core
     * [Setting up chef server core and workstation for master node](./installing-chef.md#setting-up-chef-server-core-and-workstation-for-master-node)
