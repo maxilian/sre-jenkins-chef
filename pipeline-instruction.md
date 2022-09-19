@@ -40,7 +40,31 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
 4. Fork repo from https://github.com/docker-archive/swarm-microservice-demo-v1, so we can make some changes on configuration file within our repo. [forked repo](https://github.com/maxilian/swarm-microservice-demo-v1)
 
 ## Getting ready to build docker images required by voting apps
-1. Update some files in order to avoid deprecated dependencies such as changing java 7 to java 8 or above. [[reference](https://stackoverflow.com/questions/50824789/why-am-i-getting-received-fatal-alert-protocol-version-or-peer-not-authentic)]
+1. Make new pipeline for build and deploy apps.
+
+    * Click new item from Jenkins Dashboard fill the name and select pipeline before clicking OK.
+
+    ![New Pipeline Wizard](./images/jenkins-create-pipeline-wizard.png)
+
+    * Fill description, tick github checkbox and then fill with forked repo url `https://github.com/maxilian/swarm-microservice-demo-v1`
+
+    ![Fill repo source](./images/jenkins-newly-created-pipeline-1.png "Filling source code repo")
+
+    * in Build Triggers section tick `GitHub hook trigger for GITScm polling`
+
+     ![Select build triggers](./images/jenkins-newly-created-pipeline-2.png "Select build triggers")
+    
+    * in Advanced Project Options, fill display name that will be shown from jenkins GUI for this pipeline
+
+    ![Pipeline display name](./images/jenkins-newly-created-pipeline-3.png "Pipeline display name")
+
+    * The last field that must be filled is Pipeline with pipeline script selected, but we will explain on [Preparation to Run Jenkins Pipeline File][#Preparation-to-Run-Jenkins-Pipeline-File]
+
+    ![Pipeline script](./images/jenkins-newly-created-pipeline-4.png "Pipeline Script")
+
+    * Save pipeline
+
+2. Update some files in order to avoid deprecated dependencies such as changing java 7 to java 8 or above. [[reference](https://stackoverflow.com/questions/50824789/why-am-i-getting-received-fatal-alert-protocol-version-or-peer-not-authentic)]
 
     * [vote-worker/Dockerfile](https://github.com/maxilian/swarm-microservice-demo-v1/blob/master/vote-worker/Dockerfile)
     ```
@@ -103,34 +127,25 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
         }
     }
     ```
-2. Make new pipeline for build and deploy apps.
-
-    * Click new item from Jenkins Dashboard fill the name and select pipeline before clicking OK.
-    ![New Pipeline Wizard](./images/jenkins-create-pipeline-wizard.png)
-    * Fill description, tick github checkbox and then fill with forked repo url `https://github.com/maxilian/swarm-microservice-demo-v1`
-    ![Fill repo source](./images/jenkins-newly-created-pipeline-1.png "Filling source code repo")
-    * in Build Triggers section tick `GitHub hook trigger for GITScm polling`
-     ![Select build triggers](./images/jenkins-newly-created-pipeline-2.png "Select build triggers")
-
-2. Build docker image for vote-worker
+3. Build docker image for vote-worker
     ```
     cd vote-worker
     docker build -t 172.18.100.71:5000/voteapps/vote-worker:latest
     docker push 172.18.100.71:5000/voteapps/vote-worker:latest
     ```
-3. Build docker image for results-app
+4. Build docker image for results-app
     ```
     cd ../results-app
     docker build -t 172.18.100.71:5000/voteapps/results-app:latest
     docker push 172.18.100.71:5000/voteapps/results-app:latest
     ```
-4. Build docker image for web-vote-app
+5. Build docker image for web-vote-app
     ```
     cd ../web-vote-app
     docker build -t 172.18.100.71:5000/voteapps/web-vote-app:latest
     docker push 172.18.100.71:5000/voteapps/web-vote-app:latest
     ```
-5. After we build all required docker images for this voting apps, in summary we will use this images for thex next step:
+6. After we build all required docker images for this voting apps, in summary we will use this images for thex next step:
     * 172.18.100.71:5000/voteapps/vote-worker
     * 172.18.100.71:5000/voteapps/results-app
     * 172.18.100.71:5000/voteapps/web-vote-app
@@ -138,7 +153,7 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
     * postgre:9.1
 
 
-## Preparing Jenkins Pipeline File
+## Preparation to Run Jenkins Pipeline File
 
 We have 3 docker servers which join docker swarm that consist of 1 node manager (test-71) and 2 worker nodes (test-72 and test-73).  
 
@@ -236,7 +251,7 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
     }
     ```
 
-3. Jenkinsfile for this project will be like this [link](./jenkinsfile)
+3. The Full Jenkinsfile script for this project will be like this [link](./jenkinsfile)
 4. To check all container is running well, we can use this docker command:
     ```
     docker service ls 
