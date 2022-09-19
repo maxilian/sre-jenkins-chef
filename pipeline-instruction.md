@@ -269,7 +269,7 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
 3. The Full Jenkinsfile script for this project will be like this [link](./jenkinsfile)
 4. To run Jenkins Pipeline we can use `Build Now` button within pipeline menu. Other method is using webhooks from github repo config which can trigger build automatically when code commited to repo, but in this case we should press the button manually since we don't expose jenkins server to public.
 
-    ![Build Now](./images/running-docker-service.png "Build Now")
+    ![Build Now](./images/build-now.png "Build Now")
 
 5. To check all container is running well, we can use this docker command:
     ```
