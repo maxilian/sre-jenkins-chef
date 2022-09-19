@@ -4,6 +4,16 @@
 
 Pipeline is a collection of jobs or squences to brings software from Git repository into user hands by using automation process as soon as the code is commited to the repository. The pipeline can be used for build, testing, or deploying the software with certain scenario. In order to do automation process a jenkinsfile needs to be present at the project's root repository or from pipeline cofiguration on jenkins settings.
 
+The minimal Pipeline consists of :
+* Agent 
+    Which jenkins agent will be used to build the project
+* Stages/stage
+    Stages block contains a series of steps in a pipeline, stage result may be used for the next stage sequence which can run shell, build, testing or deploying.
+* Steps
+    A step is a single task that executes a particular process or command. This block is part of stage.
+
+![Pipeline timetable](./images/jenkins-pipeline-timetable.png "Pipeline")
+
 ## Setting up docker cluster and required plugin for jenkins
 1. Install Docker swarm plugin from jenkins dashboard and then restart the service
 2. Setting up Docker swarm on master node
