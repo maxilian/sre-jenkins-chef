@@ -219,5 +219,10 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
     ```
     docker service ls 
     ```
-5. Some container may need to be manually removed (or even can be wrote into jenkinsfile) because cached file is still exist.
+5. After database is running then we will make new table to store voting result. Run this command from node manager
+    ```
+    docker exec "$(docker ps -q -f name=store)" psql -U postgres -c \
+    "CREATE TABLE IF NOT EXISTS votes (id integer CONSTRAINT pk_id_votes PRIMARY KEY, vote varchar(10), ts TIMESTAMP WITHOUT TIME ZONE);"
+    ```
+6. Some container may need to be manually removed (or even can be wrote into jenkinsfile) because cached file is still exist.
 
