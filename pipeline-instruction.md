@@ -127,21 +127,21 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
         }
     }
     ```
-3. Build docker image for vote-worker
+3. Snippet command to build docker image for vote-worker
     ```
     cd vote-worker
     docker build -t 172.18.100.71:5000/voteapps/vote-worker:latest
     docker push 172.18.100.71:5000/voteapps/vote-worker:latest
     ```
-4. Build docker image for results-app
+4. Snippet command to build docker image for results-app
     ```
-    cd ../results-app
+    cd results-app
     docker build -t 172.18.100.71:5000/voteapps/results-app:latest
     docker push 172.18.100.71:5000/voteapps/results-app:latest
     ```
-5. Build docker image for web-vote-app
+5. Snippet command to build docker image for web-vote-app
     ```
-    cd ../web-vote-app
+    cd web-vote-app
     docker build -t 172.18.100.71:5000/voteapps/web-vote-app:latest
     docker push 172.18.100.71:5000/voteapps/web-vote-app:latest
     ```
@@ -150,7 +150,7 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
     * 172.18.100.71:5000/voteapps/results-app
     * 172.18.100.71:5000/voteapps/web-vote-app
     * redis:3 
-    * postgre:9.1
+    * postgre:9.0
 
 
 ## Preparation to Run Jenkins Pipeline File
@@ -256,10 +256,17 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
     ```
     docker service ls 
     ```
-5. After database is running then we will make new table to store voting result. Run this command from node manager
-    ```
-    docker exec "$(docker ps -q -f name=store)" psql -U postgres -c \
-    "CREATE TABLE votes (id integer CONSTRAINT pk_id_votes PRIMARY KEY, vote varchar(10), ts TIMESTAMP WITHOUT TIME ZONE);"
-    ```
-6. Some container may need to be manually removed (or even can be wrote into jenkinsfile) because cached file is still exist.
+    ![Running service](./images/running-docker-service.png "Running service")
+    
+5. Some container may need to be manually removed because cached file is still exist (this method even can be wrote into jenkinsfile with conditional block) 
+6. To access web-vote-apps we can go to `http://172.18.100.71:4000`
+
+    ![web-vote-app](./images/web-vote-app.png "web-vote-app")
+
+7. To access results-app we can go to `http://172.18.100.71:8089`
+
+    ![results-app](./images/results-app.png "results-app")
+
+
+
 
