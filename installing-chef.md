@@ -114,7 +114,7 @@ Before we can adding node, we should install chef workstation om each node
     ```
     knife ssh "name:test-72" "sudo chef-client" -x administrator
     ```
-[install docker using chef](./images/installing-docker-using-chef.png "install docker using chef")
+![install docker using chef](./images/installing-docker-using-chef.png "install docker using chef")
 
 
 ---
@@ -241,9 +241,9 @@ B. Create cookbook and recipe
     knife ssh "name:test-72" "sudo chef-client" -x administrator
     knife ssh "name:test-73" "sudo chef-client" -x administrator
     ```
-    [install jenkins agent](./images/install-jenkins-agent-on-docker-container.png "Install jenkins agent")
+    ![install jenkins agent](./images/install-jenkins-agent-on-docker-container.png "Install jenkins agent")
 10. Ensure all nodes connected to jenkins controller/master
-    [Connected jenkins agents](./images/jenkins-agent-list.png "Connected agents")
+    ![Connected jenkins agents](./images/jenkins-agent-list.png "Connected agents")
 11. Or checking docker container from each nodes
     ```
     docker container ls -a
