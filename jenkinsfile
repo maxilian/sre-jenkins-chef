@@ -21,7 +21,7 @@ pipeline {
 
         }
 
-        stage("Build result-app") {
+        stage("Build results-app") {
             steps {
                 sh """
                     cd results-app
@@ -39,17 +39,129 @@ pipeline {
                     cd vote-worker
                     docker build -t 172.18.100.71:5000/voteapps/vote-worker:latest .
                     docker push 172.18.100.71:5000/voteapps/vote-worker:latest
+                    
                 """
             }
 
         }
 
-        stage("Deploy") {
-
+        stage("Deploy web-vote-app and redis to worker node")
+        {
             steps {
-                sh "ls -al"
-                sh "docker stack deploy --compose-file deploy-voting-apps.yml votingapps"
+                sh '''
+                    ls -al
+                    if [ ! "$(docker service ps redis01)" ]; then
+                        docker service create \
+                        --name redis01 \
+                        --network test-network \
+                        --replicas 2 \
+                        --publish 6379:6379 \
+                        --constraint node.hostname!=test-71 \
+                        --detach redis:3
+                    else 
+                        docker service update \
+                        --replicas 2 \
+                        --publish-add 6379:6379 \
+                        --constraint-add node.hostname!=test-71 \
+                        --image redis:3 \
+                        --detach redis01
+                    fi
+                    
+
+                    if [ ! "$(docker service ps frontend01)" ]; then
+                       docker service create \
+                        --name frontend01 \
+                        --network test-network \
+                        --replicas 2 \
+                        --publish 4000:80 \
+                        --constraint node.hostname!=test-71 \
+                        --env WEB_VOTE_NUMBER='01' \
+                        --detach 172.18.100.71:5000/voteapps/web-vote-app:latest
+                    else 
+                       docker service update \
+                        --replicas 2 \
+                        --publish-add 4000:80 \
+                        --constraint-add node.hostname!=test-71 \
+                        --env-add WEB_VOTE_NUMBER='01' \
+                        --image 172.18.100.71:5000/voteapps/web-vote-app:latest \
+                        --detach frontend01
+                    fi
+                    
+                '''
             }
         }
+
+        stage("Deploy postgresql as DB") {
+
+            steps {
+                sh '''
+                if [ ! "$(docker service ps store)" ]; then
+                    docker service create \
+                    --constraint node.hostname==test-71 \
+                    --name store \
+                    --env POSTGRES_PASSWORD=pg8675309 \
+                    --network test-network  \
+                    --publish 5432:5432 \
+                    --detach postgres:9.0
+                else
+                    docker service update \
+                    --publish-add 5432:5432 \
+                    --image postgres:9.0 \
+                    --detach store
+                fi
+                '''
+            }
+        }
+
+        stage("Deploy vote-worker") {
+
+            steps {
+                sh '''
+
+                 if [ ! "$(docker service ps vote-worker)" ]; then
+                    docker service create \
+                    --constraint node.hostname==test-71 \
+                    --name vote-worker \
+                    --env WORKER_NUMBER="01" \
+                    --env FROM_REDIS_HOST=1 \
+                    --env TO_REDIS_HOST=2 \
+                    --network test-network  \
+                    --detach 172.18.100.71:5000/voteapps/vote-worker:latest
+                else
+                    docker service update \
+                    --env-add WORKER_NUMBER="01" \
+                    --env-add FROM_REDIS_HOST=1 \
+                    --env-add TO_REDIS_HOST=2 \
+                    --detach vote-worker
+                fi
+
+                '''
+            }
+        }
+
+        stage("Deploy results-app") {
+
+            steps {
+                sh '''
+
+                 if [ ! "$(docker service ps results-app)" ]; then
+                    docker service create \
+                    --constraint node.hostname==test-71 \
+                    --name results-app \
+                    --publish 8089:80 \
+                    --network test-network  \
+                    --detach 172.18.100.71:5000/voteapps/results-app:latest
+                else
+                    docker service update \
+                    --publish-add 8089:80 \
+                    --image 172.18.100.71:5000/voteapps/results-app \
+                    --detach results-app
+                fi
+
+                '''
+            }
+        }
+
+        
     }
 }

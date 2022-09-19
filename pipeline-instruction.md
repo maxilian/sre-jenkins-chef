@@ -2,10 +2,10 @@
 
 ## What is jenkins pipeline?
 
-Pipeline is a collection of jobs or squences to brings software from Git repository into user hands by using automation process as soon as the code is commited to the repository. The pipeline can be used for build, testing, or deploying the software with certain scenario. In order to do automation process a jenkinsfile needs to be present at the project's root repository.
+Pipeline is a collection of jobs or squences to brings software from Git repository into user hands by using automation process as soon as the code is commited to the repository. The pipeline can be used for build, testing, or deploying the software with certain scenario. In order to do automation process a jenkinsfile needs to be present at the project's root repository or from pipeline cofiguration on jenkins settings.
 
-## Setting up jenkins pipeline to deploy apps within docker cluster
-1. Install Docker swarm plugin from jenkins and then restart the service
+## Setting up docker cluster and required plugin for jenkins
+1. Install Docker swarm plugin from jenkins dashboard and then restart the service
 2. Setting up Docker swarm on master node
     ```
     docker swarm init
@@ -22,17 +22,26 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
 
     }
     ```
-5. Add jenkins user to docker group and restart jenkins
+
+    restart docker service
+    ```
+    sudo systemctl restart docker
+    ```
+
+5. Add jenkins user to docker group and restart jenkins (this step will allows jenkins to run docker)
     ```
     sudo usermod -a -G docker jenkins
     sudo systemctl restart jenkins
     ```
 6. Deploy registry2 to hold docker image repository
-```
-docker run -d -p 5000:5000 --restart=always --name registry registry:2
-```
+    ```
+    docker run -d -p 5000:5000 --restart=always --name registry registry:2
+    ```
 4. Fork repo from https://github.com/docker-archive/swarm-microservice-demo-v1
-5. Update some files in order to avoid deprecated dependencies
+
+## Getting ready to build docker images required by voting apps
+1. Update some files in order to avoid deprecated dependencies such as changing java7 to java 8 or above. [[reference](https://stackoverflow.com/questions/50824789/why-am-i-getting-received-fatal-alert-protocol-version-or-peer-not-authentic)]
+
     * vote-worker/Dockerfile
     ```
     FROM openjdk:11
@@ -51,4 +60,111 @@ docker run -d -p 5000:5000 --restart=always --name registry registry:2
 
     CMD ["/usr/lib/jvm/java-11-openjdk-amd64/bin/java", "-jar", "target/worker-jar-with-dependencies.jar"]
     ```
+2. Build docker image for vote-worker
+    ```
+    cd vote-worker
+    docker build -t 172.18.100.71:5000/voteapps/vote-worker:latest
+    docker push 172.18.100.71:5000/voteapps/vote-worker:latest
+    ```
+3. Build docker image for results-app
+    ```
+    cd ../results-app
+    docker build -t 172.18.100.71:5000/voteapps/results-app:latest
+    docker push 172.18.100.71:5000/voteapps/results-app:latest
+    ```
+4. Build docker image for web-vote-app
+    ```
+    cd ../web-vote-app
+    docker build -t 172.18.100.71:5000/voteapps/web-vote-app:latest
+    docker push 172.18.100.71:5000/voteapps/web-vote-app:latest
+    ```
+5. After we build all required docker images for this voting apps, in summary we will use this images for thex next step:
+    * 172.18.100.71:5000/voteapps/vote-worker
+    * 172.18.100.71:5000/voteapps/results-app
+    * 172.18.100.71:5000/voteapps/web-vote-app
+    * redis:3 
+    * postgre:9.0
+
+
+## Preparing Jenkins Pipeline File
+
+We have 3 docker servers which join docker swarm that consist of 1 node manager (test-71) and 2 worker nodes (test-72 and test-73).  
+
+1. We will deploy a combination of web-vote-app (using port 4000) and redis (using port 6379) to worker node. Since we cannot expose the same ports from two or more services (that's how clustered environment works and docker too), so in this scenario we will deploy 2 replicas from a pair of web-vote-app and redis. Jenkinsfile snippet:
+    ```
+        stage("Deploy web-vote-app and redis to worker node")
+        {
+            steps {
+                sh '''
+                    ls -al
+                    if [ ! "$(docker service ps redis01)" ]; then
+                        docker service create \
+                        --name redis01 \
+                        --network test-network \
+                        --replicas 2 \
+                        --publish 6379:6379 \
+                        --constraint node.hostname!=test-71 \
+                        --detach redis:3
+                    else 
+                        docker service update \
+                        --replicas 2 \
+                        --publish-add 6379:6379 \
+                        --image redis:3 \
+                        --constraint node.hostname!=test-71 \
+                        --detach redis01
+                    fi
+                    
+
+                    if [ ! "$(docker service ps frontend01)" ]; then
+                       docker service create \
+                        --name frontend01 \
+                        --network test-network \
+                        --replicas 2 \
+                        --publish 4000:80 \
+                        --env WEB_VOTE_NUMBER='01' \
+                        --constraint node.hostname!=test-71 \
+                        --detach 172.18.100.71:5000/voteapps/web-vote-app:latest
+                    else 
+                       docker service update \
+                        --replicas 2 \
+                        --publish-add 4000:80 \
+                        --env-add WEB_VOTE_NUMBER='01' \
+                        --image 172.18.100.71:5000/voteapps/web-vote-app:latest \
+                        --constraint node.hostname!=test-71 \
+                        --detach frontend01
+                    fi
+                    
+                '''
+            }
+        }
+
+
+    ```
+
+2. The next step we will deploy results-app (using port 8089), postgresql (using port 5432), and vote-worker to node test-71. Jenkinsfile snippet:
+    ```
+    stage("Deploy postgresql as DB") {
+
+        steps {
+            sh '''
+            if [ ! "$(docker service ps postgres)" ]; then
+                docker service create \
+                --constraint node.hostname==test-71 \
+                --name store \
+                --env POSTGRES_PASSWORD=pg8675309 \
+                --network test-network  \
+                --publish 5432:5432 \
+                --detach postgres:9.6
+            else
+                docker service update \
+                --publish-add 5432:5432 \
+                --detach store
+            fi
+            '''
+        }
+    }
+    ```
+
+3. Jenkinsfile for this project will be like this [link](./jenkinsfile)
+
 6. Create new docker-compose to deploy the apps [link](deploy-voting-apps.yml)
