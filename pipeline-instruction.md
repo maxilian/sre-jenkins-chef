@@ -159,7 +159,8 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
 
 1. We will deploy a combination of web-vote-app (accessible from port 4000) and 2 redis to worker node. Since we cannot expose the same ports from two or more services for redis container we will not expose port to public (that's how clustered environment works and docker too). So, all services can be accessed from Cluster Manager ip address/hostname or by using reverse proxy. Which in the end the traffic will be handled by cluster manager through swarm overlay network.
 
-Jenkinsfile snippet:
+    Jenkinsfile snippet:
+
     ```
         stage("Deploy web-vote-app and redis to worker node")
         {
@@ -220,7 +221,6 @@ Jenkinsfile snippet:
                 '''
             }
         }
-
 
     ```
 
