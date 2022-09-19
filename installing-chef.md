@@ -161,33 +161,56 @@ A. Install Docker Plugin For Jenkins
     ```
     knife ssh "name:master-chef" "sudo chef-client" -x administrator
     ```
-    
+
 B. Enable Docker plugin from jenkins dashboard and restart jenkins service
     ```
     sudo systemctl restart jenkins
     ```
 ---
 
-## INSTALLING DOCKER BASED JENKINS SLAVE CONTAINER
+## INSTALLING DOCKER BASED JENKINS SLAVE CONTAINER USING CHEF RECIPES
+
+In this section, we will install jenkins slave using jenkins:inbound-agent image by using chef as orchestration tools.
 
 A. Adding each slave node into jenkins
 
 1. Login into jenkins dashboard
-2. Move towards Manage jenkins > manage nodes and cloud
-3. Add new node and fill the name field and click create
+
+    ![Jenkins Dashboard](./images/jenkins-dashboard.png "Jenkins Dashboard")
+
+2. From side bar click menu `Manage jenkins > manage nodes and cloud`
+3. Click add `New Node` button on sidebar and fill on the name also click radio button of type `Permanent Agent` and then click `create` button
+
+    ![Jenkins New Node](./images/jenkins-naming-node.png "Jenkins New Node")
+
 4. Fill required field
-5. On field launch method choose "launch agent by connecting it to the controller"
-6. Tick use socket
-7. Save the configuration
-8. Click on the newly created node and write down the secret key that will be used for creating jenkins agent container
-9. Ensure all ports used by agent available to get jenkins agent connected into controller. Click Manage Jenkins > Configure global security
+
+    ![Jenkins Required Field](./images/jenkins-required-node-1.png "Jenkins required field 1")
+
+    ![Jenkins Required Field](./images/jenkins-required-node-2.png "Jenkins required field 2")
+
+5. On section launch method choose `launch agent by connecting it to the controller`, tick `Use Websocket` checkbox
+
+    ![Jenkins Launch Method](./images/jenkins-launch-agent-method.png "Jenkins agent launch method")
+
+6. Save the configuration
+7. Click on the newly created node and write down the secret key that will be used for creating jenkins agent container
+8. Ensure all ports used by agent available to get jenkins agent connected into controller. Click `Manage Jenkins > Configure global security` and then scroll down until you find agent section. On `TCP port for inbound agent` click random and tick checkbox on agent protocol to use TLS encryption.
+
+    ![Jenkins Agent Required Setting](./images/jenkins-agent-required-settings.png "reuqired settings")
 
 B. Create cookbook and recipe
 
+    After setting up all required node setting and security now we will deploy jenkins slave container with chef.
+
 1. Create new recipe using chef
     ```
+    cd ~/.chef/
     chef generate cookbook install_jenkins_slave
     ```
+
+    ![Jenkins Slave Cookbooks](./images/chef-generate-cookbook-recipe.png "Jenkins Slave Cookbooks")
+
 2. Open metadata.rb
     ```
     nano ~/.chef/cookbook/install_jenkins_slave/metadata.rb
@@ -229,7 +252,7 @@ B. Create cookbook and recipe
 
 7. Upload all required cookbooks to chef server repository
     ```
-    knife cookbook upload cookbookNameHere
+    knife cookbook upload jenkins_install_slave
     ```
     Or you can run `knife upload .` to uploading all cookbook inside repo
 
