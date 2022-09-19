@@ -10,3 +10,20 @@ This repo contain all required files and instructions that consist of :
     * [Installing Docker Based Jenkins Slave Container](./installing-chef.md#installing-docker-based-jenkins-slave-container)
 3. [Jenkins Pipeline and step by step how to deploy voting apps in clustered environment](./pipeline-instruction.md)
 4. Cookbooks and Recipe to install docker, jenkins agent, jenkins docker plugin [link](./cookbooks/)
+
+---
+
+## REQUIREMENT
+
+We need to create 3 virtual machines with linux installed. In this scenario I will use Ubuntu server 20.04 inside Hyper-v.
+
+    * 1 vcpu
+    * Ubuntu server 20.04
+    * Storage 50GB
+    * RAM 6GB
+
+Each VM will be named with test-71 (172.18.100.71), test-72 (172.18.100.72), and test-73 (172.18.100.72).
+
+![Hyper-V VM](./images/virtual-machine.png "3 Virtual Machines using Hyper-V")
+
+
