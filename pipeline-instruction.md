@@ -7,7 +7,7 @@ Pipeline is a collection of jobs or squences to brings software from Git reposit
 The minimal Pipeline consists of :
 * Agent 
 
-    Which jenkins agent will be used to build the project
+    Defines which jenkins agent will be used to build the project
 * Stages/stage
 
     Stages block contains a series of steps in a pipeline, stage result may be used for the next stage sequence which can run shell, build, testing or deploying.
