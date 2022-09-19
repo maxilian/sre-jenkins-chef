@@ -267,18 +267,22 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
     ```
 
 3. The Full Jenkinsfile script for this project will be like this [link](./jenkinsfile)
-4. To check all container is running well, we can use this docker command:
+4. To run Jenkins Pipeline we can use `Build Now` button within pipeline menu. Other method is using webhooks from github repo config which can trigger build automatically when code commited to repo, but in this case we should press the button manually since we don't expose jenkins server to public.
+
+    ![Build Now](./images/running-docker-service.png "Build Now")
+
+5. To check all container is running well, we can use this docker command:
     ```
     docker service ls 
     ```
     ![Running service](./images/running-docker-service.png "Running service")
     
-5. Some container may need to be manually removed because cached file is still exist (this method even can be wrote into jenkinsfile with conditional block) 
-6. To access web-vote-apps we can go to `http://172.18.100.71:4000`
+6. Some container may need to be manually removed because cached file is still exist (this method even can be wrote into jenkinsfile with conditional block) 
+7. To access web-vote-apps we can go to `http://172.18.100.71:4000`
 
     ![web-vote-app](./images/web-vote-app.png "web-vote-app")
 
-7. To access results-app we can go to `http://172.18.100.71:8089`
+8. To access results-app we can go to `http://172.18.100.71:8089`
 
     ![results-app](./images/results-app.png "results-app")
 
