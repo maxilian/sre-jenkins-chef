@@ -161,6 +161,7 @@ A. Install Docker Plugin For Jenkins
     ```
     knife ssh "name:master-chef" "sudo chef-client" -x administrator
     ```
+    
 B. Enable Docker plugin from jenkins dashboard and restart jenkins service
     ```
     sudo systemctl restart jenkins
