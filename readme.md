@@ -20,7 +20,7 @@ We need to create 3 virtual machines with linux installed. In this scenario I wi
     * 1 vcpu
     * Ubuntu server 20.04
     * Storage 50GB
-    * RAM 6GB
+    * RAM 6GB with dynamic RAM mode
 
 Each VM will be named with test-71 (172.18.100.71), test-72 (172.18.100.72), and test-73 (172.18.100.72).
 
