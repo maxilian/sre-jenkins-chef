@@ -7,7 +7,7 @@ This repo contain all required files and instructions that consist of :
     * [Working with cookbooks, recipes, and repositories](./installing-chef.md#working-with-cookbooks-and-repositories)
     * [Setup Chef Nodes (From Chef Manager/Master) And Install Docker To All Node](./installing-chef.md#setup-chef-nodes-from-chef-managermaster-and-install-docker-to-all-node)
     * [Setup Jenkins Docker Plugin Using Chef](./installing-chef.md#setup-jenkins-docker-plugin-using-chef)
-    * [Installing Jenkins Slave Container](./installing-chef.md#installing-docker-based-jenkins-slave-container)
+    * [Installing Jenkins Slave Container](./installing-chef.md#installing-jenkins-agent-container-using-chef-recipes)
 3. [Jenkins Pipeline and step by step how to deploy voting apps in clustered environment](./pipeline-instruction.md)
 4. Cookbooks and Recipe to install docker, jenkins agent, jenkins docker plugin [link](./cookbooks/)
 
