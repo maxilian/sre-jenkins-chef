@@ -170,7 +170,7 @@ The minimal Pipeline consists of :
 
 We have 3 docker servers which join docker swarm that consist of 1 node manager (test-71) and 2 worker nodes (test-72 and test-73).  
 
-1. We will deploy a combination of web-vote-app (accessible from port 4000) and 2 redis to worker node. Since we cannot expose the same ports from two or more services for redis container we will not expose port to public (that's how clustered environment works and docker too). So, all services can be accessed from Cluster Manager ip address/hostname or by using reverse proxy. Which in the end the traffic will be handled by cluster manager through swarm overlay network.
+1. We will deploy a combination of web-vote-app (accessible from port 4000) and 2 instaces of different redis (redis01 and redis02) to worker node. Since we cannot expose the same ports from two or more services for redis container we will not expose port to public (that's how clustered environment works and docker too). So, all services can be accessed from Cluster Manager ip address/hostname or by using reverse proxy. Which in the end the traffic will be handled by cluster manager through swarm overlay network.
 
     Jenkinsfile snippet:
 
@@ -237,7 +237,7 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
 
     ```
 
-2. The next step we will deploy results-app (port 8089), postgresql, and vote-worker to node test-71. Jenkinsfile snippet:
+2. The next step we will deploy results-app (port 8089), postgresql, and vote-worker to node test-71, this node is a node manager. Jenkinsfile snippet:
     ```
     stage("Deploy postgresql as DB") {
 
@@ -250,7 +250,7 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
                 --env POSTGRES_PASSWORD=pg8675309 \
                 --network test-network  \
                 --publish 5432:5432 \
-                --detach postgres:9.1
+                --detach postgres:9.0
             else
                 docker service rm store
                 docker service create \
@@ -259,14 +259,14 @@ We have 3 docker servers which join docker swarm that consist of 1 node manager 
                 --env POSTGRES_PASSWORD=pg8675309 \
                 --network test-network  \
                 --publish 5432:5432 \
-                --detach postgres:9.1
+                --detach postgres:9.0
             fi
             '''
         }
     }
     ```
 
-3. The Full Jenkinsfile script for this project will be like this [link](./jenkinsfile)
+3. The Full Jenkinsfile script for this project will be like this [link](./jenkinsfile). This jenkinsfile include build stages to create Docker images and deploying stages to nodes.
 4. To run Jenkins Pipeline we can use `Build Now` button within pipeline menu. Other method is using webhooks from github repo config which can trigger build automatically when code commited to repo, but in this case we should press the button manually since we don't expose jenkins server to public.
 
     ![Build Now](./images/build-now.png "Build Now")

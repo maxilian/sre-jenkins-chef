@@ -118,7 +118,7 @@ pipeline {
                     --env POSTGRES_PASSWORD=pg8675309 \
                     --network test-network  \
                     --publish 5432:5432 \
-                    --detach postgres:9.1
+                    --detach postgres:9.0
                 else
                     docker service rm store
                     docker service create \
@@ -127,7 +127,7 @@ pipeline {
                     --env POSTGRES_PASSWORD=pg8675309 \
                     --network test-network  \
                     --publish 5432:5432 \
-                    --detach postgres:9.1
+                    --detach postgres:9.0
                 fi
                 '''
             }
